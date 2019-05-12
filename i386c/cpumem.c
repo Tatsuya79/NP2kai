@@ -26,9 +26,16 @@
 #if defined(SUPPORT_PCI)
 #include	"bios/bios.h"
 #endif
+#if defined(SUPPORT_IA32_HAXM)
+#include	"i386hax/haxfunc.h"
+#include	"i386hax/haxcore.h"
+#endif
 
-
+#if defined(SUPPORT_IA32_HAXM)
+	UINT8	*mem = NULL; // Alloc in pccore_mem_malloc()
+#else
 	UINT8	mem[0x200000];
+#endif
 
 
 typedef void (MEMCALL * MEM8WRITE)(UINT32 address, REG8 value);
@@ -300,6 +307,23 @@ const VACCTBL	*vacc;
 	if (!(func & 0x20)) {
 #endif	// defined(SUPPORT_PC9821)
 		vacc = vacctbl + (func & 0x0f);
+#if defined(SUPPORT_IA32_HAXM)
+		if (np2hax.enable) {
+			if ((func & 0x0f) < 8) {
+				if(np2haxcore.lastVRAMMMIO){
+					i386hax_vm_setmemoryarea(mem+0xA8000, 0xA8000, 0x8000);
+					i386hax_vm_setmemoryarea(mem+0xB0000, 0xB0000, 0x10000);
+					np2haxcore.lastVRAMMMIO = 0;
+				}
+			}else{
+				if(!np2haxcore.lastVRAMMMIO){
+					i386hax_vm_removememoryarea(mem+0xA8000, 0xA8000, 0x8000);
+					i386hax_vm_removememoryarea(mem+0xB0000, 0xB0000, 0x10000);
+					np2haxcore.lastVRAMMMIO = 1;
+				}
+			}
+		}
+#endif
 
 		memfn0.rd8[0xa8000 >> 15] = vacc->rd8;
 		memfn0.rd8[0xb0000 >> 15] = vacc->rd8;
@@ -342,6 +366,16 @@ const VACCTBL	*vacc;
 #if defined(SUPPORT_PC9821)
 	}
 	else {
+#if defined(SUPPORT_IA32_HAXM)
+		if (np2hax.enable) {
+			if(!np2haxcore.lastVRAMMMIO){
+				i386hax_vm_removememoryarea(mem+0xA8000, 0xA8000, 0x8000);
+				i386hax_vm_removememoryarea(mem+0xB0000, 0xB0000, 0x10000);
+				np2haxcore.lastVRAMMMIO = 1;
+			}
+		}
+#endif
+
 		memfn0.rd8[0xa8000 >> 15] = memvga0_rd8;
 		memfn0.rd8[0xb0000 >> 15] = memvga1_rd8;
 		memfn0.rd8[0xb8000 >> 15] = memnc_rd8;
@@ -794,7 +828,9 @@ REG8 MEMCALL memp_read8_codefetch(UINT32 address) {
 		//	printf("BIOS32 (read8): %x");
 		//}
 		address = address & CPU_ADRSMASK;
-		if (address < USE_HIMEM) {
+		if (address < 0xB0000) {
+			return(0xff);
+		}else if (address < USE_HIMEM) {
 			return(memfn0.rd8[address >> 15](address));
 		}
 		else if (address < CPU_EXTLIMIT16) {
@@ -832,7 +868,9 @@ REG16 MEMCALL memp_read16_codefetch(UINT32 address) {
 	else {
 		if ((address + 1) & 0x7fff) {			// non 32kb boundary
 			address = address & CPU_ADRSMASK;
-			if (address < USE_HIMEM) {
+			if (address < 0xB0000) {
+				return(0xff);
+			}else if (address < USE_HIMEM) {
 				return(memfn0.rd16[address >> 15](address));
 			}
 			else if (address < CPU_EXTLIMIT16) {
@@ -878,7 +916,9 @@ UINT32 MEMCALL memp_read32_codefetch(UINT32 address) {
 	else{
 		if ((address + 1) & 0x7fff) {			// non 32kb boundary
 			address = address & CPU_ADRSMASK;
-			if (address < USE_HIMEM) {
+			if (address < 0xB0000) {
+				return(0xff);
+			}else if (address < USE_HIMEM) {
 				return(memfn0.rd32[address >> 15](address));
 			}
 			else if (address < CPU_EXTLIMIT16) {

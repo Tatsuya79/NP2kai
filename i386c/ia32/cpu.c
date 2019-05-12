@@ -281,42 +281,25 @@ exec_allstep(void)
 #if defined(SUPPORT_ASYNC_CPU)
 		// 非同期CPU処理
 		if(np2cfg.asynccpu){
-			//if(asynccpu_clockpersec.QuadPart){
-			//	// 厳密っぽい時間にする
-			//	if(clkcnt==0){
-			//		asynccpu_clockcount = GetTickCounter_Clock();
-			//		if(!((asynccpu_clockcount.QuadPart - asynccpu_lastclock.QuadPart) * pccore.realclock / asynccpu_clockpersec.QuadPart < CPU_BASECLOCK)){
-			//			if(CPU_REMCLOCK > 0){
-			//				CPU_REMCLOCK -= CPU_BASECLOCK;
-			//			}
-			//			asynccpu_lastclock = GetTickCounter_Clock();
-			//			break;
-			//		}
-			//	}
-			//	clkcnt++;
-			//	if(clkcnt >= clkstep) clkstep -= clkstep;
-			//}else{
-				// 雑なタイミングにする
-				// 時間が無ければCPU処理をスキップ
-				if(clkcnt == 0){
-					if(CPU_REMCLOCK > 0){
-						if(timing_getcount_baseclock()!=0){
-							CPU_REMCLOCK = 0;
-							break;
-						}
+			// 時間が無ければCPU処理をスキップ
+			if(clkcnt == 0){
+				if(CPU_REMCLOCK > 0){
+					if(timing_getcount_baseclock()!=0){
+						CPU_REMCLOCK = 0;
+						break;
 					}
 				}
-				clkcnt++;
-				if(clkcnt >= clkstep) clkstep -= clkstep;
-				// 時間に余裕があればCPUを動かし続ける
-				if(CPU_REMCLOCK <= 10000 && (g_nevent.item[NEVENT_FLAMES].flag & NEVENT_ENABLE) && g_nevent.item[NEVENT_FLAMES].proc==screendisp && g_nevent.item[NEVENT_FLAMES].clock <= CPU_BASECLOCK){
-					if(timing_getcount_baseclock()==0){
-						CPU_REMCLOCK = 10000;
-						clkstep = 1;
-						clkcnt = 0;
-					}
+			}
+			clkcnt++;
+			if(clkcnt >= clkstep) clkstep -= clkstep;
+			// 時間に余裕があればCPUを動かし続ける
+			if(CPU_REMCLOCK <= 10000 && (g_nevent.item[NEVENT_FLAMES].flag & NEVENT_ENABLE) && g_nevent.item[NEVENT_FLAMES].proc==screendisp && g_nevent.item[NEVENT_FLAMES].clock <= CPU_BASECLOCK){
+				if(timing_getcount_baseclock()==0){
+					CPU_REMCLOCK = 10000;
+					clkstep = 1;
+					clkcnt = 0;
 				}
-			//}
+			}
 		}
 #endif
 
@@ -401,6 +384,24 @@ exec_allstep(void)
 	#if defined(DEBUG)
 			cpu_debug_rep_cont = 0;
 	#endif
+			//if(0x16f8==CPU_PREV_EIP){
+			//	printf("debug!!!");
+			//}
+			//if(0x173f==CPU_PREV_EIP){
+			//	printf("debug!!!");
+			//}
+			//if(0x1747==CPU_PREV_EIP){
+			//	printf("debug!!!");
+			//}
+			//if(0x00b4==CPU_PREV_EIP && 0xfd80==CPU_CS){
+			//	printf("debug!!!");
+			//}
+			//if(0x0000==CPU_PREV_EIP && 0x1fc0==CPU_CS){
+			//	printf("debug!!!");
+			//}
+			//if(0xa013bc9f <= CPU_PREV_EIP && CPU_PREV_EIP <= 0xa013dc9f){
+			//	printf("debug!!!");
+			//}
 			(*insttable_1byte[CPU_INST_OP32][op])();
 			continue;
 		}

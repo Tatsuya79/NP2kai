@@ -86,6 +86,7 @@ COMMON_SOURCES=	$(real_topsrcdir)/x11/main.c \
 		$(real_topsrcdir)/statsave.c \
 		$(real_topsrcdir)/keystat.c \
 		$(real_topsrcdir)/np2_thread.c \
+		$(real_topsrcdir)/np2_tickcount.c \
 		\
 		$(real_topsrcdir)/common/strres.c \
 		$(real_topsrcdir)/common/milstr.c \
@@ -391,6 +392,8 @@ IA32_SOURCES=	$(real_topsrcdir)/i386c/cpucore.c \
 		$(real_topsrcdir)/i386c/ia32/instructions/sse/sse.c \
 		$(real_topsrcdir)/i386c/ia32/instructions/sse2/sse2.c \
 		$(real_topsrcdir)/i386c/ia32/instructions/sse3/sse3.c \
+		$(real_topsrcdir)/i386hax/haxcore.c \
+		$(real_topsrcdir)/i386hax/haxfunc.c \
 		$(real_topsrcdir)/debugsub386.c
 
 IA32_CPPFLAGS=	-I$(real_topsrcdir)/i386c \
@@ -402,7 +405,8 @@ IA32_CPPFLAGS=	-I$(real_topsrcdir)/i386c \
 		-I$(real_topsrcdir)/i386c/ia32/instructions/sse \
 		-I$(real_topsrcdir)/i386c/ia32/instructions/sse2 \
 		-I$(real_topsrcdir)/i386c/ia32/instructions/sse3 \
-		-DCPUCORE_IA32 -DUSE_FPU -DSUPPORT_FPU_DOSBOX -DSUPPORT_FPU_DOSBOX2 -DSUPPORT_FPU_SOFTFLOAT -DSUPPORT_LARGE_MEMORY -DSUPPORT_PCI -DUSE_MMX -DUSE_3DNOW -DUSE_SSE -DUSE_SSE2 -DUSE_SSE3 -DUSE_TSC -DUSE_FASTPAGING -DSUPPORT_PEGC -DSUPPORT_ASYNC_CPU -DUSE_VME -DSUPPORT_WAB -DSUPPORT_CL_GD5430 -DBIOS_IO_EMULATION
+		-I$(real_topsrcdir)/i386hax \
+		-DCPUCORE_IA32 -DUSE_FPU -DSUPPORT_FPU_DOSBOX -DSUPPORT_FPU_DOSBOX2 -DSUPPORT_FPU_SOFTFLOAT -DSUPPORT_LARGE_MEMORY -DSUPPORT_PCI -DUSE_MMX -DUSE_3DNOW -DUSE_SSE -DUSE_SSE2 -DUSE_SSE3 -DUSE_TSC -DUSE_FASTPAGING -DSUPPORT_PEGC -DSUPPORT_ASYNC_CPU -DSUPPORT_IA32_HAXM -DUSE_VME -DSUPPORT_WAB -DSUPPORT_CL_GD5430 -DBIOS_IO_EMULATION
 
 if CPUCORE_IA32
 if BUILD_ALL

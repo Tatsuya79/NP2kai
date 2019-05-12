@@ -377,8 +377,6 @@ UINT dmac_getdata_(DMACH dmach, UINT8 *buf, UINT offset, UINT size) {
 					}
 					offset = (offset+1) & CS4231_BUFMASK; // DMAデータ読み取りバッファの書き込み位置を進める（＆最後に到達したら最初に戻す）
 				}
-
-				// XXX: 再生位置調整（Win9x,Win2000再生ノイズ対策用・とりあえず+方向だけ）
 				playcount_adjustcounter += leng;
 				if(playcount_adjustcounter >= PLAYCOUNT_ADJUST_VALUE){
 					playcount_adjustcounter -= PLAYCOUNT_ADJUST_VALUE;
@@ -389,7 +387,6 @@ UINT dmac_getdata_(DMACH dmach, UINT8 *buf, UINT offset, UINT size) {
 						}
 					}
 				}
-
 				dmach->adrs.d = addr; // DMA読み取りアドレス現在位置を更新
 			}
 			else {									// dir -
