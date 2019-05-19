@@ -349,14 +349,14 @@ static void sound_term(void) {
 int pccore_mem_malloc_virtualalloc = 0;
 void pccore_mem_malloc(void) {
 	if(!mem){
-#if defined(NP2_WIN)
+#if defined(_WINDOWS)
 		mem = (UINT8*)_aligned_malloc(0x200000, 4096);
 #else
 		mem = (UINT8*)aligned_alloc(4096, 0x200000);
 #endif
 	}
 	if(!vramex || vramex==vramex_base){
-#if defined(NP2_WIN)
+#if defined(_WINDOWS)
 		vramex = (UINT8*)_aligned_malloc(0x80000, 4096);
 #else
 		vramex = (UINT8*)aligned_alloc(4096, 0x80000);
@@ -366,7 +366,7 @@ void pccore_mem_malloc(void) {
 }
 void pccore_mem_free(void) {
 	if(mem){
-#if defined(NP2_WIN)
+#if defined(_WINDOWS)
 		_aligned_free(mem);
 #else
 		free(mem);
@@ -374,7 +374,7 @@ void pccore_mem_free(void) {
 		mem = NULL;
 	}
 	if(vramex && vramex!=vramex_base){
-#if defined(NP2_WIN)
+#if defined(_WINDOWS)
 		_aligned_free(vramex);
 #else
 		free(vramex);
