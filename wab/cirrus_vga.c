@@ -7000,7 +7000,11 @@ void pc98_cirrus_vga_init(void)
 
 	cirrusvga_opaque = cirrusvga = s = (CirrusVGAState*)calloc(1, sizeof(CirrusVGAState));
 #else
+#if defined(SUPPORT_IA32_HAXM)
+	vramptr = (uint8_t*)aligned_alloc(4096, CIRRUS_VRAM_SIZE*2); // 2倍取っておく
+#else
 	vramptr = (uint8_t*)malloc(CIRRUS_VRAM_SIZE*2); // 2倍取っておく
+#endif
 
 	ds.surface = &np2vga_ds_surface;
 	ds.listeners = &np2vga_ds_listeners;
@@ -7131,7 +7135,7 @@ void pc98_cirrus_vga_shutdown(void)
 	free(ga_bmpInfo);
 #endif
 #if defined(SUPPORT_IA32_HAXM)
-#if defined(＿WINDOWS)
+#if !defined(NP2_X11) && !defined(NP2_SDL2) && !defined(__LIBRETRO__)
 	_aligned_free(vramptr);
 #else
 	free(vramptr);
